@@ -14,7 +14,9 @@ def print_hi(name):
 if __name__ == '__main__':
     print_hi('PyCharm')
 
-    df = pd.read_csv('./f1db_csv/circuits.csv')
+
+
+    df = pd.read_csv('./f1db_csv/results.csv', "/f1db_csv/races.csv" )
 
     print(df.to_string())
 
