@@ -2,7 +2,7 @@
 DROP TABLE IF EXISTS circuits;
 CREATE TABLE circuits (
   circuitId SERIAL PRIMARY KEY,
-  circuitRef VARCHAR(255) NOT NULL DEFAULT '',
+ -- circuitRef VARCHAR(255) NOT NULL DEFAULT '',
   name VARCHAR(255) NOT NULL DEFAULT '',
   location VARCHAR(255),
   country VARCHAR(255),
@@ -24,7 +24,7 @@ CREATE TABLE status (
 DROP TABLE IF EXISTS constructors;
 CREATE TABLE constructors (
   constructorId SERIAL PRIMARY KEY,
-  constructorRef VARCHAR(255) NOT NULL DEFAULT '',
+ -- constructorRef VARCHAR(255) NOT NULL DEFAULT '',
   name VARCHAR(255) NOT NULL DEFAULT '',
   nationality VARCHAR(255),
   url VARCHAR(255) NOT NULL DEFAULT ''
@@ -35,7 +35,7 @@ CREATE TABLE constructors (
 DROP TABLE IF EXISTS drivers;
 CREATE TABLE drivers (
   driverId SERIAL PRIMARY KEY,
-  driverRef VARCHAR(255) NOT NULL DEFAULT '',
+ -- driverRef VARCHAR(255) NOT NULL DEFAULT '',
   number INT,
   code VARCHAR(3),
   forename VARCHAR(255) NOT NULL DEFAULT '',
@@ -228,6 +228,8 @@ CREATE TABLE pitStops (
 
 
 
+--INSERT INTO circuits (name,location,country,lat, lng,alt, url)
+           --                          VALUES ('test','germany','germany',23.0,3.0,2.0,'eewr')
 
 
 
