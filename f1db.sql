@@ -8,7 +8,7 @@ CREATE TABLE circuits (
   country VARCHAR(255),
   lat FLOAT,
   lng FLOAT,
-  alt INT,
+ -- alt INT,
   url VARCHAR(255) NOT NULL DEFAULT ''
 );
 

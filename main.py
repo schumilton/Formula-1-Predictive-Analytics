@@ -20,6 +20,7 @@ if __name__ == '__main__':
 
     dreef = DataFetcher.DataFetcher()
     dreef.fetchCircuits()
+    dreef.fetchStatus()
 
   #  df = pd.read_csv('./f1db_csv/results.csv', "/f1db_csv/races.csv")
 
