@@ -69,3 +69,62 @@ class DataFetcher:
             print("FetchCircuits:")
             print("Already up-to-date: ", count2)
             print("Added: ", count1)
+
+    def fetchConstructors(self):
+        with urllib.request.urlopen("http://ergast.com/api/f1/constructors.json?limit=1000") as url:
+            data = json.load(url)
+            count1 = 0
+            count2 = 0
+            for constructor in data["MRData"]["ConstructorTable"]["Constructors"]:
+                try:
+
+                    self.cur.execute('INSERT INTO constructors (name, nationality,url)'
+                                     ' VALUES (%s, %s, %s)',
+                                     (constructor["name"],
+                                      constructor["nationality"],
+                                      constructor["url"]))
+
+                    print(constructor["name"])
+                    count1 += 1
+                    self.conn.commit()
+
+
+                except Exception as err:
+
+                    self.conn.rollback()
+                    print(err)
+                    count2 += 1
+
+            print("FetchConstructors:")
+            print("Already up-to-date: ", count2)
+            print("Added: ", count1)
+    def fetchDrivers(self):
+        with urllib.request.urlopen("http://ergast.com/api/f1/drivers.json?limit=1000") as url:
+            data = json.load(url)
+            count1 = 0
+            count2 = 0
+            for driver in data["MRData"]["DriverTable"]["Drivers"]:
+                try:
+
+                    self.cur.execute('INSERT INTO drivers (forename,surname,dob,nationality,url)'
+                                     ' VALUES (%s,%s,%s,%s,%s)',
+                                     (driver["givenName"]),
+                                     driver["familyName"],
+                                     driver["dateOfBirth"],
+                                     driver["nationality"],
+                                     driver["url"])
+
+                    print(driver["givenName"])
+                    count1 += 1
+                    self.conn.commit()
+
+
+                except Exception as err:
+
+                    self.conn.rollback()
+                    print(err)
+                    count2 += 1
+
+            print("FetchDriver:")
+            print("Already up-to-date: ", count2)
+            print("Added: ", count1)

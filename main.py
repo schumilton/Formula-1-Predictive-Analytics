@@ -1,5 +1,6 @@
 # This is a sample Python script.
 import psycopg
+import pyergast as pyergast
 
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
@@ -17,11 +18,8 @@ def print_hi(name):
 if __name__ == '__main__':
     print_hi('PyCharm')
 
+    print(pyergast.query_driver("raikkonen"))
+    pyergast.get_drivers()
+    pyergast.get_race_result()
+    pyergast.get_schedule()
 
-    dreef = DataFetcher.DataFetcher()
-    dreef.fetchCircuits()
-    dreef.fetchStatus()
-
-  #  df = pd.read_csv('./f1db_csv/results.csv', "/f1db_csv/races.csv")
-
-  #  print(df.to_string())

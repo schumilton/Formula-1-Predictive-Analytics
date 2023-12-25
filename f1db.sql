@@ -9,14 +9,16 @@ CREATE TABLE circuits (
   lat FLOAT,
   lng FLOAT,
  -- alt INT,
-  url VARCHAR(255) NOT NULL DEFAULT ''
+  url VARCHAR(255) NOT NULL DEFAULT '',
+    UNIQUE (url)
 );
 
 -- Table structure for table "status"
 DROP TABLE IF EXISTS status;
 CREATE TABLE status (
   statusId SERIAL PRIMARY KEY,
-  status VARCHAR(255) NOT NULL DEFAULT ''
+  status VARCHAR(255) NOT NULL DEFAULT '',
+    UNIQUE (status)
 
 );
 
@@ -27,7 +29,8 @@ CREATE TABLE constructors (
  -- constructorRef VARCHAR(255) NOT NULL DEFAULT '',
   name VARCHAR(255) NOT NULL DEFAULT '',
   nationality VARCHAR(255),
-  url VARCHAR(255) NOT NULL DEFAULT ''
+  url VARCHAR(255) NOT NULL DEFAULT '',
+    UNIQUE (url)
 
 );
 
@@ -36,20 +39,23 @@ DROP TABLE IF EXISTS drivers;
 CREATE TABLE drivers (
   driverId SERIAL PRIMARY KEY,
  -- driverRef VARCHAR(255) NOT NULL DEFAULT '',
-  number INT,
-  code VARCHAR(3),
+--  number INT,
+  --code VARCHAR(3),
   forename VARCHAR(255) NOT NULL DEFAULT '',
   surname VARCHAR(255) NOT NULL DEFAULT '',
   dob DATE,
   nationality VARCHAR(255),
-  url VARCHAR(255) NOT NULL DEFAULT ''
+  url VARCHAR(255) NOT NULL DEFAULT '',
+    UNIQUE (url)
 );
 
 -- Table structure for table "seasons"
 DROP TABLE IF EXISTS seasons;
 CREATE TABLE seasons (
   year INT PRIMARY KEY,
-  url VARCHAR(255) NOT NULL DEFAULT ''
+  url VARCHAR(255) NOT NULL DEFAULT '',
+    UNIQUE (url)
+
 );
 
 
@@ -75,7 +81,8 @@ CREATE TABLE races (
   sprint_date DATE,
   sprint_time TIME,
   FOREIGN KEY (circuitId) REFERENCES circuits(circuitId),
- Foreign KEY (year) REFERENCES seasons(year)
+ Foreign KEY (year) REFERENCES seasons(year),
+    UNIQUE (year,fp1_date, name)
 );
 
 -- Table structure for table "qualifying"
@@ -93,7 +100,8 @@ CREATE TABLE qualifying (
     UNIQUE (raceId,driverId,constructorId),
  FOREIGN KEY (constructorId)  REFERENCES constructors(constructorId),
     FOREIGN KEY (driverId) REFERENCES drivers(driverId),
-    FOREIGN KEY (raceId) references races(raceId)
+    FOREIGN KEY (raceId) references races(raceId),
+                        UNIQUE(qualifyId,raceId,driverId)
 );
 
 
@@ -121,7 +129,9 @@ CREATE TABLE results (
     foreign key (statusId) REFERENCES status(statusId),
     FOREIGN KEY (raceId) references races(raceId),
     FOREIGN KEY (driverId) REFERENCES drivers(driverId),
-    FOREIGN KEY (constructorId) REFERENCES constructors(constructorId)
+    FOREIGN KEY (constructorId) REFERENCES constructors(constructorId),
+    UNIQUE (raceId,driverId)
+
 );
 
 -- Table structure for table "sprintResults"
@@ -146,7 +156,8 @@ CREATE TABLE sprintResults (
   FOREIGN KEY (raceId) REFERENCES races(raceId),
     FOREIGN KEY (driverId) REFERENCES drivers(driverId),
     FOREIGN KEY (constructorId) REFERENCES  constructors(constructorId),
-    foreign key (statusId) references status(statusId)
+    foreign key (statusId) references status(statusId),
+    UNIQUE (driverId,sprintResultId)
 );
 
 -- Table structure for table "constructorResults"
@@ -158,7 +169,8 @@ CREATE TABLE constructorResults (
   points FLOAT,
   status VARCHAR(255),
     FOREIGN KEY (raceId) REFERENCES races(raceId),
-    FOREIGN KEY (constructorId) REFERENCES constructors(constructorId)
+    FOREIGN KEY (constructorId) REFERENCES constructors(constructorId),
+                                UNIQUE (raceId,constructorResultsId)
 );
 
 -- Table structure for table "constructorStandings"
