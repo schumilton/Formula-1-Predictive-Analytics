@@ -428,7 +428,7 @@ def get_race_result(year=None, race=None):
         assert year and race, 'You must specify both a year and a race'
         url = 'http://ergast.com/api/f1/{}/{}/results.json?limit=1000'.format(year, race)
     else:
-        url = 'http://ergast.com/api/f1/current/last/results.json?limit=1000'
+        url = 'http://ergast.com/api/f1/current/last/results .json?limit=1000'
 
     try:
         r = urllib.request.urlopen(url)
