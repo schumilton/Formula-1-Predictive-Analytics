@@ -8,7 +8,7 @@ CREATE TABLE circuits (
   country VARCHAR(255),
   lat FLOAT,
   lng FLOAT,
- -- alt INT,
+  alt INT,
   url VARCHAR(255) NOT NULL DEFAULT '',
     UNIQUE (url)
 );
@@ -30,7 +30,7 @@ CREATE TABLE constructors (
   name VARCHAR(255) NOT NULL DEFAULT '',
   nationality VARCHAR(255),
   url VARCHAR(255) NOT NULL DEFAULT '',
-    UNIQUE (url)
+    UNIQUE (url,name)
 
 );
 
