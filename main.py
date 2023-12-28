@@ -26,6 +26,7 @@ if __name__ == '__main__':
     #fetcher.fetchConstructors()
     #fetcher.fetchDrivers()
     #fetcher.fetchSeasons()
-    fetcher.fetchRaces()
+  #  fetcher.fetchRaces()
 
-    fetcher.fetchQualifying()
+   # fetcher.fetchQualifying()
+    fetcher.fetchResults()
