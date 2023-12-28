@@ -46,7 +46,7 @@ CREATE TABLE drivers (
   dob DATE,
   nationality VARCHAR(255),
   url VARCHAR(255) NOT NULL DEFAULT '',
-    UNIQUE (url)
+    UNIQUE (url,forename,surname)
 );
 
 -- Table structure for table "seasons"
@@ -68,21 +68,10 @@ CREATE TABLE races (
   circuitId INT NOT NULL DEFAULT '0',
   name VARCHAR(255) NOT NULL DEFAULT '',
   date DATE NOT NULL DEFAULT '1970-01-01', -- Updated default date
-  time TIME,
   url VARCHAR(255),
-  fp1_date DATE,
-  fp1_time TIME,
-  fp2_date DATE,
-  fp2_time TIME,
-  fp3_date DATE,
-  fp3_time TIME,
-  quali_date DATE,
-  quali_time TIME,
-  sprint_date DATE,
-  sprint_time TIME,
   FOREIGN KEY (circuitId) REFERENCES circuits(circuitId),
- Foreign KEY (year) REFERENCES seasons(year),
-    UNIQUE (year,fp1_date, name)
+Foreign KEY (year) REFERENCES seasons(year),
+    UNIQUE (date,url, name)
 );
 
 -- Table structure for table "qualifying"
