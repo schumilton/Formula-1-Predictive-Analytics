@@ -1,12 +1,10 @@
 # This is a sample Python script.
 import psycopg
 import pyergast as pyergast
-import urllib.request, json
-import urllib.request
-import json
+
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-import DataFetcher as DataFetcher
+import DataFetcher
 import DatabaseConnection
 import pandas as pd
 
@@ -19,13 +17,9 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print_hi('PyCharm')
-    fetcher = DataFetcher.DataFetcher()
 
-  #  fetcher.fetchCircuits()
-   # fetcher.fetchStatus()
-    #fetcher.fetchConstructors()
-    #fetcher.fetchDrivers()
-    #fetcher.fetchSeasons()
-    fetcher.fetchRaces()
+    print(pyergast.query_driver("raikkonen"))
+    pyergast.get_drivers()
+    pyergast.get_race_result()
+    pyergast.get_schedule()
 
-    fetcher.fetchQualifying()
