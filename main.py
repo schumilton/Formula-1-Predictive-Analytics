@@ -24,9 +24,9 @@ if __name__ == '__main__':
   #  fetcher.fetchCircuits()
    # fetcher.fetchStatus()
     #fetcher.fetchConstructors()
-    #fetcher.fetchDrivers()
-    #fetcher.fetchSeasons()
-  #  fetcher.fetchRaces()
+ #   fetcher.fetchDrivers()
+   # fetcher.fetchSeasons()
+   # fetcher.fetchRaces()
 
    # fetcher.fetchQualifying()
     fetcher.fetchResults()

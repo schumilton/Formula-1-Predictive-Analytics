@@ -1,3 +1,5 @@
+import datetime
+import time
 import urllib.request, json
 import urllib.request
 import json
@@ -23,7 +25,7 @@ class DataFetcher:
                                 "lat"] + "," +
                             circuit["Location"]["long"]) as ref:
                         elevation = json.load(ref)["results"][0]["elevation"]
-
+                        time.sleep(0.25)
                         self.cur.execute('INSERT INTO circuits (name,location,country,lat, lng,alt, url)'
                                          'VALUES (%s, %s, %s,%s,%s,%s,%s)',
                                          (circuit["circuitName"],
@@ -161,15 +163,15 @@ class DataFetcher:
 
     def fetchRaces(self):
         self.cur.execute("Select DISTINCT year from Seasons ORDER BY year ASC")
-
+        count1 = 0
+        count2 = 0
         years = self.cur.fetchall()
         print(years[0][0])
         for year in years:
             print(year)
             with urllib.request.urlopen("http://ergast.com/api/f1/" + str(year[0]) + "/races.json?limit=2000") as url:
                 data = json.load(url)
-                count1 = 0
-                count2 = 0
+
                 for race in data["MRData"]["RaceTable"]["Races"]:
                     try:
                         self.cur.execute("SELECT circuitid FROM circuits where circuits.name = %s ",
@@ -203,7 +205,8 @@ class DataFetcher:
 
     def fetchQualifying(self):
         self.cur.execute("Select DISTINCT year from Seasons ORDER BY year ASC")
-
+        count1 = 0
+        count2 = 0
         years = self.cur.fetchall()
         print(years[0][0])
         for year in years:
@@ -211,8 +214,7 @@ class DataFetcher:
             with urllib.request.urlopen(
                     "http://ergast.com/api/f1/" + str(year[0]) + "/qualifying.json?limit=2000") as url:
                 data = json.load(url)
-                count1 = 0
-                count2 = 0
+
                 for race in data["MRData"]["RaceTable"]["Races"]:
                     try:
 
@@ -236,13 +238,14 @@ class DataFetcher:
                                 (str(driver["Constructor"]["url"]), str(driver["Constructor"]["name"])))
 
                             constructor_id = self.cur.fetchone()[0]
-                            q2_value = driver.get("Q2", " ")
-                            q3_value = driver.get("Q3", " ")
+                            q1_value = driver.get("Q1", "00:00.000")
+                            q2_value = driver.get("Q2", "00:00.000")
+                            q3_value = driver.get("Q3", "00:00.000")
 
                             self.cur.execute("INSERT INTO qualifying(raceid,driverid,constructorid,number,position,"
                                              "q1,q2,q3) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (
                                                  race_id, driver_id, constructor_id, driver["number"],
-                                                 driver["position"], driver["Q1"],
+                                                 driver["position"], q1_value,
                                                  q2_value, q3_value))
                             count1 += 1
 
@@ -262,7 +265,8 @@ class DataFetcher:
 
     def fetchResults(self):
         self.cur.execute("Select DISTINCT year from Seasons ORDER BY year ASC")
-
+        count1 = 0
+        count2 = 0
         years = self.cur.fetchall()
         print(years[0][0])
         for year in years:
@@ -270,8 +274,7 @@ class DataFetcher:
             with urllib.request.urlopen(
                     "http://ergast.com/api/f1/" + str(year[0]) + "/results.json?limit=2000") as url:
                 data = json.load(url)
-                count1 = 0
-                count2 = 0
+
                 for result in data["MRData"]["RaceTable"]["Races"]:
                     try:
 
@@ -288,28 +291,32 @@ class DataFetcher:
                                              (str(driver["Driver"]["url"]),))
 
                             driver_id = self.cur.fetchone()[0]
-                            print(driver_id)
+                          #  print(driver_id)
 
                             self.cur.execute(
                                 "SELECT constructorid FROM constructors where constructors.url = %s AND constructors.name = %s ",
                                 (str(driver["Constructor"]["url"]), str(driver["Constructor"]["name"])))
 
                             constructor_id = self.cur.fetchone()[0]
-                            print(constructor_id)
+                           # print(constructor_id)
                             self.cur.execute(
                                 "SELECT statusid FROM status where status.status = %s ",
                                 (str(driver["status"]),))
 
                             status_id = self.cur.fetchone()[0]
-                            print(status_id)
+                          #  print(status_id)
+
 
                             time = driver.get("Time", {}).get("time", 0)
 
+
+
+
                             fastestlap = driver.get("FastestLap", {}).get("lap", 0)
                             rank =driver.get("FastestLap", {}).get("rank", 0)
-                            fastestLaptime = driver.get("FastestLap", {}).get("Time", {}).get("time", 0)
+                            fastestLaptime = driver.get("FastestLap", {}).get("Time", {}).get("time","00:00.000")
                             speed = driver.get("FastestLap", {}).get("AverageSpeed", {}).get("speed", 0)
-                            print(speed)
+                           # print(speed)
 
                             self.cur.execute("INSERT INTO results(raceid,driverid,constructorid,number,grid,position,"
                                              "positiontext,points,laps,time,fastestlap,"

@@ -71,7 +71,7 @@ CREATE TABLE races (
   url VARCHAR(255),
   FOREIGN KEY (circuitId) REFERENCES circuits(circuitId),
 Foreign KEY (year) REFERENCES seasons(year),
-    UNIQUE (date,url, name)
+    UNIQUE (url, name)
 );
 
 -- Table structure for table "qualifying"
@@ -83,9 +83,9 @@ CREATE TABLE qualifying (
   constructorId INT NOT NULL DEFAULT '0',
   number INT NOT NULL DEFAULT '0',
   position INT,
-  q1 VARCHAR(255),
-  q2 VARCHAR(255),
-  q3 VARCHAR(255),
+  q1 TIME(3),
+  q2 TIME(3),
+  q3 TIME(3),
     UNIQUE (raceId,driverId,constructorId),
  FOREIGN KEY (constructorId)  REFERENCES constructors(constructorId),
     FOREIGN KEY (driverId) REFERENCES drivers(driverId),
@@ -108,11 +108,11 @@ CREATE TABLE results (
  -- positionOrder INT NOT NULL DEFAULT '0',
   points FLOAT NOT NULL DEFAULT '0',
   laps INT NOT NULL DEFAULT '0',
-  time time,
+  time varchar(250),
  -- milliseconds INT,
   fastestLap INT,
   rank INT DEFAULT '0',
-  fastestLapTime VARCHAR(255),
+  fastestLapTime TIME(3),
   fastestLapSpeed VARCHAR(255),
   statusId INT NOT NULL DEFAULT '0',
     foreign key (statusId) REFERENCES status(statusId),
