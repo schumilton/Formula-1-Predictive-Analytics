@@ -29,4 +29,5 @@ if __name__ == '__main__':
    # fetcher.fetchRaces()
 
    # fetcher.fetchQualifying()
-    fetcher.fetchResults()
+   # fetcher.fetchResults()
+    fetcher.fetchSprintResults()

@@ -277,13 +277,11 @@ class DataFetcher:
 
                 for result in data["MRData"]["RaceTable"]["Races"]:
                     try:
-
                         self.cur.execute("SELECT raceid FROM races where races.name = %s AND races.year = %s ",
                                          (str(result["raceName"]), result["season"]))
-
                         race_id = self.cur.fetchone()
-
                         print(race_id)
+
                         for driver in result["Results"]:
                             print(driver["Driver"]["url"])
 
@@ -291,20 +289,17 @@ class DataFetcher:
                                              (str(driver["Driver"]["url"]),))
 
                             driver_id = self.cur.fetchone()[0]
-                          #  print(driver_id)
 
                             self.cur.execute(
                                 "SELECT constructorid FROM constructors where constructors.url = %s AND constructors.name = %s ",
                                 (str(driver["Constructor"]["url"]), str(driver["Constructor"]["name"])))
-
                             constructor_id = self.cur.fetchone()[0]
-                           # print(constructor_id)
+
                             self.cur.execute(
                                 "SELECT statusid FROM status where status.status = %s ",
                                 (str(driver["status"]),))
-
                             status_id = self.cur.fetchone()[0]
-                          #  print(status_id)
+
 
 
                             time = driver.get("Time", {}).get("time", 0)
@@ -316,7 +311,7 @@ class DataFetcher:
                             rank =driver.get("FastestLap", {}).get("rank", 0)
                             fastestLaptime = driver.get("FastestLap", {}).get("Time", {}).get("time","00:00.000")
                             speed = driver.get("FastestLap", {}).get("AverageSpeed", {}).get("speed", 0)
-                           # print(speed)
+
 
                             self.cur.execute("INSERT INTO results(raceid,driverid,constructorid,number,grid,position,"
                                              "positiontext,points,laps,time,fastestlap,"
@@ -327,9 +322,73 @@ class DataFetcher:
                                                  driver["points"], driver["laps"], time, fastestlap,
                                                  rank, fastestLaptime, speed, status_id))
                             count1 += 1
-
                             print(driver["Driver"]["givenName"])
+                            self.conn.commit()
 
+
+                    except Exception as err:
+                        self.conn.rollback()
+                        print(err)
+                        count2 += 1
+
+        print("FetchDriver:")
+        print("Already up-to-date: ", count2)
+        print("Added: ", count1)
+
+    def fetchSprintResults(self):
+        self.cur.execute("Select DISTINCT year from Seasons ORDER BY year ASC")
+        count1 = 0
+        count2 = 0
+        years = self.cur.fetchall()
+        print(years[0][0])
+        for year in years:
+
+            with urllib.request.urlopen(
+                    "http://ergast.com/api/f1/" + str(year[0]) + "/sprint.json?limit=2000") as url:
+                data = json.load(url)
+
+                for result in data["MRData"]["RaceTable"]["Races"]:
+                    try:
+                        self.cur.execute("SELECT raceid FROM races where races.name = %s AND races.year = %s ",
+                                         (str(result["raceName"]), result["season"]))
+                        race_id = self.cur.fetchone()
+                        print(race_id)
+
+                        for driver in result["SprintResults"]:
+                            print(driver["Driver"]["url"])
+
+                            self.cur.execute("SELECT driverid FROM drivers where drivers.url = %s  ",
+                                             (str(driver["Driver"]["url"]),))
+
+                            driver_id = self.cur.fetchone()[0]
+
+                            self.cur.execute(
+                                "SELECT constructorid FROM constructors where constructors.url = %s AND constructors.name = %s ",
+                                (str(driver["Constructor"]["url"]), str(driver["Constructor"]["name"])))
+                            constructor_id = self.cur.fetchone()[0]
+
+                            self.cur.execute(
+                                "SELECT statusid FROM status where status.status = %s ",
+                                (str(driver["status"]),))
+                            status_id = self.cur.fetchone()[0]
+
+                            time = driver.get("Time", {}).get("time", 0)
+
+                            fastestlap = driver.get("FastestLap", {}).get("lap", 0)
+                            rank = driver.get("FastestLap", {}).get("rank", 0)
+                            fastestLaptime = driver.get("FastestLap", {}).get("Time", {}).get("time", "00:00.000")
+                            speed = driver.get("FastestLap", {}).get("AverageSpeed", {}).get("speed", 0)
+
+                            self.cur.execute("INSERT INTO sprintresults(raceid,driverid,constructorid,number,grid,position,"
+                                             "positiontext,points,laps,time,fastestlap,"
+                                             "fastestlaptime,statusid) VALUES (%s,%s,%s,%s,"
+                                             "%s,%s,%s,%s,%s,%s,%s,%s,%s)", (
+                                                 race_id, driver_id, constructor_id, driver["number"],
+                                                 driver["grid"], driver["position"], driver["positionText"],
+                                                 driver["points"], driver["laps"], time, fastestlap,
+                                                  fastestLaptime, status_id))
+                            count1 += 1
+                            print(driver["Driver"]["givenName"])
                             self.conn.commit()
 
 
