@@ -225,7 +225,7 @@ CREATE TABLE pitStops (
   lap INT NOT NULL,
   time TIME NOT NULL,
   duration VARCHAR(255),
-  milliseconds INT,
+--  milliseconds INT,
   PRIMARY KEY (raceId, driverId, stop),
   FOREIGN KEY (raceId) REFERENCES races(raceId),
     FOREIGN KEY (driverId) REFERENCES drivers(driverId),
