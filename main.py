@@ -20,7 +20,7 @@ def print_hi(name):
 if __name__ == '__main__':
     print_hi('PyCharm')
     fetcher = DataFetcher.DataFetcher()
-
+    ''''
     fetcher.fetchCircuits()
 
     fetcher.fetchStatus()
@@ -34,3 +34,5 @@ if __name__ == '__main__':
     fetcher.fetchSprintResults()
 
     fetcher.fetchConstructorStandings()
+    '''
+    fetcher.fetchDriverStandings()
