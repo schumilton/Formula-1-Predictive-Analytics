@@ -20,24 +20,27 @@ class DataFetcher:
 
             for circuit in data["MRData"]["CircuitTable"]["Circuits"]:
                 try:
-                    with urllib.request.urlopen(
-                            "https://api.open-elevation.com/api/v1/lookup?locations=" + circuit["Location"][
-                                "lat"] + "," +
-                            circuit["Location"]["long"]) as ref:
-                        elevation = json.load(ref)["results"][0]["elevation"]
+                    try:
+                        with urllib.request.urlopen(
+                                "https://api.open-elevation.com/api/v1/lookup?locations=" + circuit["Location"][
+                                    "lat"] + "," +
+                                circuit["Location"]["long"]) as ref:
+                            elevation = json.load(ref)["results"][0]["elevation"]
                         time.sleep(0.25)
-                        self.cur.execute('INSERT INTO circuits (name,location,country,lat, lng,alt, url)'
-                                         'VALUES (%s, %s, %s,%s,%s,%s,%s)',
-                                         (circuit["circuitName"],
-                                          circuit["Location"]["locality"],
-                                          circuit["Location"]["country"],
-                                          circuit["Location"]["lat"],
-                                          circuit["Location"]["long"],
-                                          elevation,
-                                          circuit["url"]))
-                        print("Die Strecke " + circuit["circuitName"] + " wurde hinzugefügt :)")
-                        count1 += 1
-                        self.conn.commit()
+                    except Exception:
+                        elevation = 0
+                    self.cur.execute('INSERT INTO circuits (name,location,country,lat, lng,alt, url)'
+                                     'VALUES (%s, %s, %s,%s,%s,%s,%s)',
+                                     (circuit["circuitName"],
+                                      circuit["Location"]["locality"],
+                                      circuit["Location"]["country"],
+                                      circuit["Location"]["lat"],
+                                      circuit["Location"]["long"],
+                                      elevation,
+                                      circuit["url"]))
+                    print("Die Strecke " + circuit["circuitName"] + " wurde hinzugefügt :)")
+                    count1 += 1
+                    self.conn.commit()
 
                 except Exception as err:
                     print(err)
@@ -174,8 +177,8 @@ class DataFetcher:
 
                 for race in data["MRData"]["RaceTable"]["Races"]:
                     try:
-                        self.cur.execute("SELECT circuitid FROM circuits where circuits.name = %s ",
-                                         (str(race["Circuit"]["circuitName"]),))
+                        self.cur.execute("SELECT circuitid FROM circuits where circuits.url = %s ",
+                                         (race["Circuit"]["url"],))
 
                         circuit_id = self.cur.fetchone()[0]
                         print(circuit_id)

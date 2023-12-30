@@ -22,6 +22,7 @@ if __name__ == '__main__':
     fetcher = DataFetcher.DataFetcher()
 
     fetcher.fetchCircuits()
+
     fetcher.fetchStatus()
     fetcher.fetchConstructors()
     fetcher.fetchDrivers()
