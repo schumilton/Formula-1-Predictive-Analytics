@@ -512,3 +512,63 @@ class DataFetcher:
         print("FetchDriver:")
         print("Already up-to-date: ", count2)
         print("Added: ", count1)
+
+
+    def fetchLaptimes(self):
+        self.cur.execute("Select DISTINCT year from Seasons ORDER BY year ASC")
+        count1 = 0
+        count2 = 0
+        years = self.cur.fetchall()
+        print(years[0][0])
+        for year in years:
+#http://ergast.com/api/f1/2023/7/laps.json?limit=2000
+            self.cur.execute(
+                "SELECT max(round) FROM races inner join Seasons on races.year = Seasons.year WHERE races.year = %s",
+                (year,))
+            maxRound = int(self.cur.fetchone()[0])
+
+            for round in range(1, maxRound):
+                print(round)
+
+                with urllib.request.urlopen(
+                        "http://ergast.com/api/f1/" + str(year[0]) + "/" + str(
+                            round) + "/laps.json?limit=2000") as url:
+                    data = json.load(url)
+
+                    if len(data["MRData"]["RaceTable"]["Races"]) > 0:
+
+                        for lap in data["MRData"]["RaceTable"]["Races"][0]["Laps"]:
+                            lap_nr = lap["number"]
+                            print(lap)
+                            for time in lap["Timings"]:
+
+                                try:
+                                    self.cur.execute("SELECT raceid FROM races where races.round = %s AND races.year = %s ",
+                                                     (round, year[0]))
+                                    race_id = self.cur.fetchone()
+                                    print(race_id)
+
+
+
+                                    self.cur.execute(
+                                        "SELECT driverid FROM drivers where drivers.driverref = %s ",
+                                        (str(time["driverId"]),))
+                                    driver_id = self.cur.fetchone()[0]
+
+                                    self.cur.execute("INSERT INTO laptimes(raceid,driverid"
+                                                     ",position,time,lap) VALUES (%s,%s,%s,%s,%s)", (
+                                                         race_id, driver_id, time["position"],
+                                                         time["time"],lap_nr))
+                                    count1 += 1
+                                    print(time["time"])
+                                    self.conn.commit()
+
+
+                                except Exception as err:
+                                    self.conn.rollback()
+                                    print(err)
+                                    count2 += 1
+
+        print("FetchDriver:")
+        print("Already up-to-date: ", count2)
+        print("Added: ", count1)

@@ -35,4 +35,5 @@ if __name__ == '__main__':
 
     fetcher.fetchConstructorStandings()
     '''
-    fetcher.fetchDriverStandings()
+ # fetcher.fetchDriverStandings()
+    fetcher.fetchLaptimes()
