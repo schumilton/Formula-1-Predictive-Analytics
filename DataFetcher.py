@@ -625,3 +625,21 @@ class DataFetcher:
         print("FetchDriver:")
         print("Already up-to-date: ", count2)
         print("Added: ", count1)
+
+
+    def fetchAll(self):
+
+        print("FetchAll:")
+        self.fetchCircuits()
+        self.fetchStatus()
+        self.fetchConstructors()
+        self.fetchDrivers()
+        self.fetchSeasons()
+        self.fetchRaces()
+        self.fetchQualifying()
+        self.fetchResults()
+        self.fetchSprintResults()
+        self.fetchConstructorStandings()
+        self.fetchDriverStandings()
+        self.fetchLaptimes()
+        self.fetchPitstops()
