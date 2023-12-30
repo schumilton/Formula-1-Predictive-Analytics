@@ -117,7 +117,7 @@ class DataFetcher:
 
                     self.cur.execute('INSERT INTO drivers (forename,driverref,surname,dob,nationality,url)'
                                      ' VALUES (%s,%s,%s,%s,%s,%s)',
-                                     (driver["givenName"],driver["driverId"],
+                                     (driver["givenName"], driver["driverId"],
                                       driver["familyName"],
                                       driver["dateOfBirth"],
                                       driver["nationality"],
@@ -183,7 +183,6 @@ class DataFetcher:
                         circuit_id = self.cur.fetchone()[0]
                         print(circuit_id)
 
-
                         self.cur.execute(
                             'INSERT INTO races (year, round, circuitid, name, date, url)'
                             ' VALUES (%s,%s,%s,%s,%s,%s)',
@@ -241,9 +240,12 @@ class DataFetcher:
                                 (str(driver["Constructor"]["url"]), str(driver["Constructor"]["name"])))
 
                             constructor_id = self.cur.fetchone()[0]
-                            q1_value = driver.get("Q1", "00:00.000")
-                            q2_value = driver.get("Q2", "00:00.000")
-                            q3_value = driver.get("Q3", "00:00.000")
+                            q1_value = driver.get("Q1", "59:59.999")
+                            q2_value = driver.get("Q2", "59:59.999")
+                            q3_value = driver.get("Q3", "59:59.999")
+
+                            if q1_value == "":
+                                q1_value = "59:000.000"
 
                             self.cur.execute("INSERT INTO qualifying(raceid,driverid,constructorid,number,position,"
                                              "q1,q2,q3) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (
@@ -303,18 +305,12 @@ class DataFetcher:
                                 (str(driver["status"]),))
                             status_id = self.cur.fetchone()[0]
 
-
-
                             time = driver.get("Time", {}).get("time", 0)
 
-
-
-
                             fastestlap = driver.get("FastestLap", {}).get("lap", 0)
-                            rank =driver.get("FastestLap", {}).get("rank", 0)
-                            fastestLaptime = driver.get("FastestLap", {}).get("Time", {}).get("time","00:00.000")
+                            rank = driver.get("FastestLap", {}).get("rank", 0)
+                            fastestLaptime = driver.get("FastestLap", {}).get("Time", {}).get("time", "00:00.000")
                             speed = driver.get("FastestLap", {}).get("AverageSpeed", {}).get("speed", 0)
-
 
                             self.cur.execute("INSERT INTO results(raceid,driverid,constructorid,number,grid,position,"
                                              "positiontext,points,laps,time,fastestlap,"
@@ -382,14 +378,15 @@ class DataFetcher:
                             fastestLaptime = driver.get("FastestLap", {}).get("Time", {}).get("time", "00:00.000")
                             speed = driver.get("FastestLap", {}).get("AverageSpeed", {}).get("speed", 0)
 
-                            self.cur.execute("INSERT INTO sprintresults(raceid,driverid,constructorid,number,grid,position,"
-                                             "positiontext,points,laps,time,fastestlap,"
-                                             "fastestlaptime,statusid) VALUES (%s,%s,%s,%s,"
-                                             "%s,%s,%s,%s,%s,%s,%s,%s,%s)", (
-                                                 race_id, driver_id, constructor_id, driver["number"],
-                                                 driver["grid"], driver["position"], driver["positionText"],
-                                                 driver["points"], driver["laps"], time, fastestlap,
-                                                  fastestLaptime, status_id))
+                            self.cur.execute(
+                                "INSERT INTO sprintresults(raceid,driverid,constructorid,number,grid,position,"
+                                "positiontext,points,laps,time,fastestlap,"
+                                "fastestlaptime,statusid) VALUES (%s,%s,%s,%s,"
+                                "%s,%s,%s,%s,%s,%s,%s,%s,%s)", (
+                                    race_id, driver_id, constructor_id, driver["number"],
+                                    driver["grid"], driver["position"], driver["positionText"],
+                                    driver["points"], driver["laps"], time, fastestlap,
+                                    fastestLaptime, status_id))
                             count1 += 1
                             print(driver["Driver"]["givenName"])
                             self.conn.commit()
@@ -412,17 +409,20 @@ class DataFetcher:
         print(years[0][0])
         for year in years:
 
-            self.cur.execute("SELECT max(round) FROM races inner join Seasons on races.year = Seasons.year WHERE races.year = %s",(year,))
+            self.cur.execute(
+                "SELECT max(round) FROM races inner join Seasons on races.year = Seasons.year WHERE races.year = %s",
+                (year,))
             maxRound = int(self.cur.fetchone()[0])
 
-            for round in range(1,maxRound):
+            for round in range(1, maxRound):
                 print(round)
 
                 with urllib.request.urlopen(
-                        "http://ergast.com/api/f1/" + str(year[0]) + "/"+ str(round)+ "/constructorStandings.json?limit=2000") as url:
+                        "http://ergast.com/api/f1/" + str(year[0]) + "/" + str(
+                            round) + "/constructorStandings.json?limit=2000") as url:
                     data = json.load(url)
 
-                    if len(data["MRData"]["StandingsTable"]["StandingsLists"])>0:
+                    if len(data["MRData"]["StandingsTable"]["StandingsLists"]) > 0:
 
                         for standing in data["MRData"]["StandingsTable"]["StandingsLists"][0]["ConstructorStandings"]:
                             print(standing["Constructor"]["url"])
@@ -513,7 +513,6 @@ class DataFetcher:
         print("Already up-to-date: ", count2)
         print("Added: ", count1)
 
-
     def fetchLaptimes(self):
         self.cur.execute("Select DISTINCT year from Seasons ORDER BY year ASC")
         count1 = 0
@@ -521,7 +520,7 @@ class DataFetcher:
         years = self.cur.fetchall()
         print(years[0][0])
         for year in years:
-#http://ergast.com/api/f1/2023/7/laps.json?limit=2000
+            # http://ergast.com/api/f1/2023/7/laps.json?limit=2000
             self.cur.execute(
                 "SELECT max(round) FROM races inner join Seasons on races.year = Seasons.year WHERE races.year = %s",
                 (year,))
@@ -543,12 +542,11 @@ class DataFetcher:
                             for time in lap["Timings"]:
 
                                 try:
-                                    self.cur.execute("SELECT raceid FROM races where races.round = %s AND races.year = %s ",
-                                                     (round, year[0]))
+                                    self.cur.execute(
+                                        "SELECT raceid FROM races where races.round = %s AND races.year = %s ",
+                                        (round, year[0]))
                                     race_id = self.cur.fetchone()
                                     print(race_id)
-
-
 
                                     self.cur.execute(
                                         "SELECT driverid FROM drivers where drivers.driverref = %s ",
@@ -558,7 +556,7 @@ class DataFetcher:
                                     self.cur.execute("INSERT INTO laptimes(raceid,driverid"
                                                      ",position,time,lap) VALUES (%s,%s,%s,%s,%s)", (
                                                          race_id, driver_id, time["position"],
-                                                         time["time"],lap_nr))
+                                                         time["time"], lap_nr))
                                     count1 += 1
                                     print(time["time"])
                                     self.conn.commit()
@@ -612,7 +610,8 @@ class DataFetcher:
 
                                 self.cur.execute("INSERT INTO pitstops(raceid,driverid"
                                                  ",stop,lap,time, duration) VALUES (%s,%s,%s,%s,%s,%s)", (
-                                                     race_id, driver_id, stop["stop"], stop["lap"], stop["time"], stop["duration"]))
+                                                     race_id, driver_id, stop["stop"], stop["lap"], stop["time"],
+                                                     stop["duration"]))
                                 count1 += 1
                                 print(stop["time"])
                                 self.conn.commit()
@@ -626,4 +625,3 @@ class DataFetcher:
         print("FetchDriver:")
         print("Already up-to-date: ", count2)
         print("Added: ", count1)
-

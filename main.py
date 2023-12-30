@@ -20,7 +20,7 @@ def print_hi(name):
 if __name__ == '__main__':
     print_hi('PyCharm')
     fetcher = DataFetcher.DataFetcher()
-    ''''
+
     fetcher.fetchCircuits()
 
     fetcher.fetchStatus()
@@ -30,11 +30,14 @@ if __name__ == '__main__':
     fetcher.fetchRaces()
 
     fetcher.fetchQualifying()
+
     fetcher.fetchResults()
+    '''
     fetcher.fetchSprintResults()
 
     fetcher.fetchConstructorStandings()
-    
- # fetcher.fetchDriverStandings()
-    fetcher.fetchLaptimes()'''
+
+    fetcher.fetchDriverStandings()
+    fetcher.fetchLaptimes()
     fetcher.fetchPitstops()
+    '''
