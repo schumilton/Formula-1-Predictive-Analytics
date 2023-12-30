@@ -21,13 +21,15 @@ if __name__ == '__main__':
     print_hi('PyCharm')
     fetcher = DataFetcher.DataFetcher()
 
-  #  fetcher.fetchCircuits()
-   # fetcher.fetchStatus()
-    #fetcher.fetchConstructors()
- #   fetcher.fetchDrivers()
-   # fetcher.fetchSeasons()
-   # fetcher.fetchRaces()
+    fetcher.fetchCircuits()
+    fetcher.fetchStatus()
+    fetcher.fetchConstructors()
+    fetcher.fetchDrivers()
+    fetcher.fetchSeasons()
+    fetcher.fetchRaces()
 
-   # fetcher.fetchQualifying()
-   # fetcher.fetchResults()
+    fetcher.fetchQualifying()
+    fetcher.fetchResults()
     fetcher.fetchSprintResults()
+
+    fetcher.fetchConstructorStandings()

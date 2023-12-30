@@ -112,9 +112,9 @@ class DataFetcher:
             for driver in data["MRData"]["DriverTable"]["Drivers"]:
                 try:
 
-                    self.cur.execute('INSERT INTO drivers (forename,surname,dob,nationality,url)'
-                                     ' VALUES (%s,%s,%s,%s,%s)',
-                                     (driver["givenName"],
+                    self.cur.execute('INSERT INTO drivers (forename,driverref,surname,dob,nationality,url)'
+                                     ' VALUES (%s,%s,%s,%s,%s,%s)',
+                                     (driver["givenName"],driver["driverId"],
                                       driver["familyName"],
                                       driver["dateOfBirth"],
                                       driver["nationality"],
@@ -179,7 +179,7 @@ class DataFetcher:
 
                         circuit_id = self.cur.fetchone()[0]
                         print(circuit_id)
-                        print()
+
 
                         self.cur.execute(
                             'INSERT INTO races (year, round, circuitid, name, date, url)'
@@ -396,6 +396,59 @@ class DataFetcher:
                         self.conn.rollback()
                         print(err)
                         count2 += 1
+
+        print("FetchDriver:")
+        print("Already up-to-date: ", count2)
+        print("Added: ", count1)
+
+    def fetchConstructorStandings(self):
+        self.cur.execute("Select DISTINCT year from Seasons ORDER BY year ASC")
+        count1 = 0
+        count2 = 0
+        years = self.cur.fetchall()
+        print(years[0][0])
+        for year in years:
+
+            self.cur.execute("SELECT max(round) FROM races inner join Seasons on races.year = Seasons.year WHERE races.year = %s",(year,))
+            maxRound = int(self.cur.fetchone()[0])
+
+            for round in range(1,maxRound):
+                print(round)
+
+                with urllib.request.urlopen(
+                        "http://ergast.com/api/f1/" + str(year[0]) + "/"+ str(round)+ "/constructorStandings.json?limit=2000") as url:
+                    data = json.load(url)
+
+                    if len(data["MRData"]["StandingsTable"]["StandingsLists"])>0:
+
+                        for standing in data["MRData"]["StandingsTable"]["StandingsLists"][0]["ConstructorStandings"]:
+                            print(standing["Constructor"]["url"])
+
+                            try:
+                                self.cur.execute("SELECT raceid FROM races where races.round = %s AND races.year = %s ",
+                                                 (round, year[0]))
+                                race_id = self.cur.fetchone()
+                                print(race_id)
+
+                                self.cur.execute(
+                                    "SELECT constructorid FROM constructors where constructors.url = %s AND constructors.name = %s ",
+                                    (str(standing["Constructor"]["url"]), str(standing["Constructor"]["name"])))
+                                constructor_id = self.cur.fetchone()[0]
+
+                                self.cur.execute("INSERT INTO constructorstandings(raceid,constructorid"
+                                                 ",points,position,positiontext,wins) VALUES (%s,%s,%s,%s,"
+                                                 "%s,%s)", (
+                                                     race_id, constructor_id, standing["points"], standing["position"],
+                                                     standing["positionText"], standing["wins"]))
+                                count1 += 1
+                                print(standing["Constructor"]["url"])
+                                self.conn.commit()
+
+
+                            except Exception as err:
+                                self.conn.rollback()
+                                print(err)
+                                count2 += 1
 
         print("FetchDriver:")
         print("Already up-to-date: ", count2)

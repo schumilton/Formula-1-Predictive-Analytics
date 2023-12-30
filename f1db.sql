@@ -38,7 +38,7 @@ CREATE TABLE constructors (
 DROP TABLE IF EXISTS drivers;
 CREATE TABLE drivers (
   driverId SERIAL PRIMARY KEY,
- -- driverRef VARCHAR(255) NOT NULL DEFAULT '',
+  driverRef VARCHAR(255) NOT NULL DEFAULT '',
 --  number INT,
   --code VARCHAR(3),
   forename VARCHAR(255) NOT NULL DEFAULT '',
@@ -149,31 +149,34 @@ CREATE TABLE sprintResults (
     UNIQUE (driverId,sprintResultId)
 );
 
--- Table structure for table "constructorResults"
-DROP TABLE IF EXISTS constructorResults;
-CREATE TABLE constructorResults (
-  constructorResultsId SERIAL PRIMARY KEY,
-  raceId INT NOT NULL DEFAULT '0',
-  constructorId INT NOT NULL DEFAULT '0',
-  points FLOAT,
-  status VARCHAR(255),
-    FOREIGN KEY (raceId) REFERENCES races(raceId),
-    FOREIGN KEY (constructorId) REFERENCES constructors(constructorId),
-                                UNIQUE (raceId,constructorResultsId)
-);
+ --Table structure for table "constructorResults"
+--DROP TABLE IF EXISTS constructorResults;
+--CREATE TABLE constructorResults (
+  --constructorResultsId SERIAL PRIMARY KEY,
+ -- raceId INT NOT NULL DEFAULT '0',
+--  constructorId INT NOT NULL DEFAULT '0',
+--  points FLOAT,
+--  statusId INT NOT NULL DEFAULT '0',
+ --   FOREIGN KEY (raceId) REFERENCES races(raceId),
+ --  FOREIGN KEY (constructorId) REFERENCES constructors(constructorId),
+  --  foreign key (statusId) references status(statusId),
+   --                            UNIQUE (raceId,constructorResultsId)
+--);
 
--- Table structure for table "constructorStandings"
+--Table structure for table "constructorStandings"
 DROP TABLE IF EXISTS constructorStandings;
-CREATE TABLE constructorStandings (
-  constructorStandingsId SERIAL PRIMARY KEY,
-  raceId INT NOT NULL DEFAULT '0',
-  constructorId INT NOT NULL DEFAULT '0',
-  points FLOAT NOT NULL DEFAULT '0',
-  position INT,
-  positionText VARCHAR(255),
-  wins INT NOT NULL DEFAULT '0',
-    FOREIGN KEY (raceId) REFERENCES races(raceId),
-    FOREIGN KEY (constructorId) REFERENCES constructors(constructorId)
+CREATE TABLE constructorStandings
+(
+    constructorStandingsId SERIAL PRIMARY KEY,
+    raceId                 INT   NOT NULL DEFAULT '0',
+    constructorId          INT   NOT NULL DEFAULT '0',
+    points                 FLOAT NOT NULL DEFAULT '0',
+    position               INT,
+    positionText           VARCHAR(255),
+    wins                   INT   NOT NULL DEFAULT '0',
+    FOREIGN KEY (raceId) REFERENCES races (raceId),
+    FOREIGN KEY (constructorId) REFERENCES constructors (constructorId),
+    Unique(raceId,constructorId)
 );
 
 
@@ -181,15 +184,16 @@ CREATE TABLE constructorStandings (
 -- Table structure for table "driverStandings"
 DROP TABLE IF EXISTS driverStandings;
 CREATE TABLE driverStandings (
-  driverStandingsId SERIAL PRIMARY KEY,
-  raceId INT NOT NULL DEFAULT '0',
-  driverId INT NOT NULL DEFAULT '0',
-  points FLOAT NOT NULL DEFAULT '0',
-  position INT,
-  positionText VARCHAR(255),
-  wins INT NOT NULL DEFAULT '0',
-    FOREIGN KEY (raceId) REFERENCES races(raceId),
-    FOREIGN KEY (driverId) REFERENCES drivers(driverId)
+driverStandingsId SERIAL PRIMARY KEY,
+ raceId INT NOT NULL DEFAULT '0',
+ driverId INT NOT NULL DEFAULT '0',
+ points FLOAT NOT NULL DEFAULT '0',
+ position INT,
+ positionText VARCHAR(255),
+ wins INT NOT NULL DEFAULT '0',
+   FOREIGN KEY (raceId) REFERENCES races(raceId),
+   FOREIGN KEY (driverId) REFERENCES drivers(driverId),
+    unique (raceId,driverId)
 );
 
 
@@ -208,7 +212,8 @@ CREATE TABLE lapTimes (
   milliseconds INT,
   PRIMARY KEY (raceId, driverId, lap),
   FOREIGN KEY (raceId) REFERENCES races(raceId),
-    FOREIGN KEY (driverId) REFERENCES drivers(driverId)
+    FOREIGN KEY (driverId) REFERENCES drivers(driverId),
+                      unique(raceId,driverId,lap)
 );
 
 -- Table structure for table "pitStops"
@@ -223,7 +228,8 @@ CREATE TABLE pitStops (
   milliseconds INT,
   PRIMARY KEY (raceId, driverId, stop),
   FOREIGN KEY (raceId) REFERENCES races(raceId),
-    FOREIGN KEY (driverId) REFERENCES drivers(driverId)
+    FOREIGN KEY (driverId) REFERENCES drivers(driverId),
+    unique (raceId,driverId,stop)
 );
 
 
