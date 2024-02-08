@@ -414,7 +414,7 @@ class DataFetcher:
                 (year,))
             maxRound = int(self.cur.fetchone()[0])
 
-            for round in range(1, maxRound):
+            for round in range(1, (maxRound+1)):
                 print(round)
 
                 with urllib.request.urlopen(
@@ -445,7 +445,7 @@ class DataFetcher:
                                                      standing["positionText"], standing["wins"]))
                                 count1 += 1
                                 print(standing["Constructor"]["url"])
-                                self.conn.commit()
+                            #    self.conn.commit()
 
 
                             except Exception as err:
@@ -469,9 +469,9 @@ class DataFetcher:
                 "SELECT max(round) FROM races inner join Seasons on races.year = Seasons.year WHERE races.year = %s",
                 (year,))
             maxRound = int(self.cur.fetchone()[0])
-
-            for round in range(1, maxRound):
-                print(round)
+####  erstes renne borhanden letztes renne wird einfach nicht hinzugefügt
+            for round in range(1, (maxRound+1)):
+                print(maxRound,"MAx")
 
                 with urllib.request.urlopen(
                         "http://ergast.com/api/f1/" + str(year[0]) + "/" + str(

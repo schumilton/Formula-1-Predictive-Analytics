@@ -244,6 +244,22 @@ CREATE TABLE pitStops
 --INSERT INTO circuits (name,location,country,lat, lng,alt, url)
 --                          VALUES ('test','germany','germany',23.0,3.0,2.0,'eewr')
 
+--position = constructorstanding + driverstanding+ qualiyingposition + jahre + strecke
+SELECT results.position,
+        drivers.surname,
+        constructorstandings.position as constructorPosition,
+         driverstandings.position as driverstandingPosition,
+         qualifying.position as qualfyingposition,
+         races.raceId,
+        races.name
+
+FROM results
+         inner join races on (results.raceid = races.raceid)
+         inner join drivers on (results.driverid = drivers.driverid)
+         inner join constructorstandings on (results.constructorId = constructorstandings.constructorId) AND (races.raceId = constructorstandings.raceId)
+         inner join driverstandings on (results.driverid = driverstandings.driverid) AND (races.raceId = driverstandings.raceId)
+         inner join qualifying on (results.driverid = qualifying.driverid) AND races.raceId = qualifying.raceId
+         inner join circuits on (races.circuitid = circuits.circuitid)
 
 
-
+--Abu dhabi ist nicht dabei da kein driverstanding dazu existiert

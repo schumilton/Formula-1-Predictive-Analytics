@@ -20,6 +20,9 @@ def print_hi(name):
 if __name__ == '__main__':
     print_hi('PyCharm')
     fetcher = DataFetcher.DataFetcher()
+#    fetcher.fetchDriverStandings()
+ #   fetcher.fetchLaptimes()
+  #  fetcher.fetchPitstops()
 
     fetcher.fetchAll()
 
