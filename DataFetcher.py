@@ -640,6 +640,7 @@ class DataFetcher:
         self.fetchResults()
         self.fetchSprintResults()
         self.fetchConstructorStandings()
+
         self.fetchDriverStandings()
         self.fetchLaptimes()
         self.fetchPitstops()
