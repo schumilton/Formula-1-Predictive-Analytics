@@ -1,11 +1,13 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, precision_score
 from FeaturesDrivers import FeaturesDrivers
 import numpy as np
 import decimal
-
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 # Daten vorbereiten
 def prepare_data(races, last_race_id):
     features = FeaturesDrivers()
@@ -78,10 +80,53 @@ def train_and_evaluate_model(data):
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
+
+    # Konfusionsmatrix berechnen
+    cm = confusion_matrix(y_test, y_pred)
+
+    # Konfusionsmatrix visualisieren
+    plt.figure(figsize=(10, 10))
+    sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', square=True, xticklabels=range(1, len(cm) + 1),
+                yticklabels=range(1, len(cm) + 1))
+    plt.xlabel('Predicted Position')
+    plt.ylabel('Actual Position')
+    plt.title('Confusion Matrix')
+    plt.show()
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Model Accuracy: {accuracy:.2f}")
     print(classification_report(y_test, y_pred, zero_division=1))
 
+    # Berechne die Precision und Accuracy für Top-10, Top-5 und Top-3
+    y_test_top10 = y_test.apply(lambda x: 1 if x <= 10 else 0)
+    y_pred_top10 = pd.Series(y_pred).apply(lambda x: 1 if x <= 10 else 0)
+    precision_top10 = precision_score(y_test_top10, y_pred_top10)
+    accuracy_top10 = accuracy_score(y_test_top10, y_pred_top10)
+    print(f"Precision for Top 10: {precision_top10:.2f}")
+    print(f"Accuracy for Top 10: {accuracy_top10:.2f}")
+
+    y_test_top5 = y_test.apply(lambda x: 1 if x <= 5 else 0)
+    y_pred_top5 = pd.Series(y_pred).apply(lambda x: 1 if x <= 5 else 0)
+    precision_top5 = precision_score(y_test_top5, y_pred_top5)
+    accuracy_top5 = accuracy_score(y_test_top5, y_pred_top5)
+    print(f"Precision for Top 5: {precision_top5:.2f}")
+    print(f"Accuracy for Top 5: {accuracy_top5:.2f}")
+
+    y_test_top3 = y_test.apply(lambda x: 1 if x <= 3 else 0)
+    y_pred_top3 = pd.Series(y_pred).apply(lambda x: 1 if x <= 3 else 0)
+    precision_top3 = precision_score(y_test_top3, y_pred_top3)
+    accuracy_top3 = accuracy_score(y_test_top3, y_pred_top3)
+    print(f"Precision for Top 3: {precision_top3:.2f}")
+    print(f"Accuracy for Top 3: {accuracy_top3:.2f}")
+
+    feature_importance = pd.DataFrame({
+        'Feature': X.columns,
+        'Importance': model.coef_[0]
+    })
+    feature_importance['Absolute Importance'] = abs(feature_importance['Importance'])
+    feature_importance = feature_importance.sort_values(by='Absolute Importance', ascending=False)
+
+    print("Feature Importance:")
+    print(feature_importance)
     return model
 
 # Vorhersage für das letzte Rennen
@@ -140,13 +185,23 @@ def predict_last_race(model, last_race_id):
         'DriverID': df['DriverID'],
         'Probability': y_pred_proba.max(axis=1)
     })
-    results['Position'] = results['Probability'].rank(method='dense', ascending=False).astype(int)
+    results['PredictedPosition'] = results['Probability'].rank(method='dense', ascending=False).astype(int)
+
+    # Get the actual race positions for each driver in the last race
+    actual_positions = []
+    for driver_id in results['DriverID']:
+        actual_position = features.get_race_position(driver_id, last_race_id)
+        actual_positions.append(actual_position)
+
+    results['ActualPosition'] = actual_positions
 
     driver_names = results['DriverID'].apply(lambda x: features.get_driver_name(x))
     results['Driver'] = driver_names
 
+    results = results.sort_values("ActualPosition")
+
     print("Predicted Last Race Results:")
-    print(results[['Position', 'Driver', 'Probability']])
+    print(results[['PredictedPosition', 'ActualPosition', 'Driver', 'Probability']])
 
 # Hauptprogramm
 def main():

@@ -413,4 +413,13 @@ class FeaturesDrivers:
         result = self.cur.fetchall()
         return result if result else None
 
-
+    def get_constructor_id(self, driver_id, race_id):
+        query = """
+                   SELECT constructorId 
+                   FROM results
+                   WHERE driverId = %s AND raceId = %s
+                   LIMIT 1;
+               """
+        self.cur.execute(query, (driver_id, race_id))
+        result = self.cur.fetchone()
+        return result[0] if result else None
