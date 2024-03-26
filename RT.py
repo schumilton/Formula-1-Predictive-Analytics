@@ -261,7 +261,7 @@ def predict_last_race(model, last_race_id):
     results = results.sort_values("PredictedPosition")
 
     print("Predicted Last Race Results:")
-    print(results[['PredictedPosition', 'ActualPosition', 'Driver', 'Constructor', 'Probability']])
+    print(results[['PredictedPosition', 'ActualPosition', 'Driver',  'Probability']])
 
 # Hauptprogramm
 def main():
