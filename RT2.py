@@ -1,15 +1,18 @@
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, precision_score, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report, precision_score
 from FeaturesDrivers import FeaturesDrivers
 from FeaturesConstructor import FeaturesConstructor
 import numpy as np
 import decimal
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import randint, uniform
 
-#Zusätzliche ConstructeurFeatures
 # Daten vorbereiten
 def prepare_data(races, last_race_id):
     features_drivers = FeaturesDrivers()
@@ -96,37 +99,42 @@ def prepare_data(races, last_race_id):
     return df
 
 # Modell trainieren und evaluieren
-def train_and_evaluate_model(data):
+def train_and_evaluate_model(data, test_size=0.2, random_state=42):
     X = data.drop(['DriverID', 'ConstructorID', 'RacePosition'], axis=1)
     y = data['RacePosition']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    param_distributions = {
+        'n_estimators': randint(50, 500),
+        'max_depth': [None] + list(range(5, 50, 5)),
+        'min_samples_split': randint(2, 20),
+        'min_samples_leaf': randint(1, 10),
+        'max_features': ['sqrt', 'log2', None],
+        'bootstrap': [True, False]
+    }
 
-    model = LogisticRegression(multi_class='multinomial', solver='lbfgs', max_iter=100000000)
-    model.fit(X_train, y_train)
+    rf = RandomForestClassifier(random_state=random_state)
+    random_search = RandomizedSearchCV(estimator=rf, param_distributions=param_distributions, n_iter=100, cv=5, n_jobs=-1, verbose=2, random_state=random_state)
+    random_search.fit(X_train, y_train)
 
-    y_pred = model.predict(X_test)
+    print("Best parameters: ", random_search.best_params_)
+    print("Best score: ", random_search.best_score_)
 
-    # Konfusionsmatrix berechnen
+    best_model = random_search.best_estimator_
+    y_pred = best_model.predict(X_test)
     cm = confusion_matrix(y_test, y_pred)
 
     # Konfusionsmatrix visualisieren
-    plt.figure(figsize=(10, 10))
-    sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', square=True, xticklabels=range(1, len(cm) + 1), yticklabels=range(1, len(cm) + 1))
-    plt.xlabel('Predicted Position')
-    plt.ylabel('Actual Position')
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
     plt.title('Confusion Matrix')
     plt.show()
 
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Model Accuracy: {accuracy:.2f}")
     print(classification_report(y_test, y_pred, zero_division=1))
-    feature_importance = pd.DataFrame({
-        'Feature': X.columns,
-        'Importance': model.coef_[0]
-    })
-    feature_importance['Absolute Importance'] = abs(feature_importance['Importance'])
-    feature_importance = feature_importance.sort_values(by='Absolute Importance', ascending=False)
 
     # Berechne die Precision und Accuracy für Top-10, Top-5 und Top-3
     y_test_top10 = y_test.apply(lambda x: 1 if x <= 10 else 0)
@@ -149,12 +157,15 @@ def train_and_evaluate_model(data):
     accuracy_top3 = accuracy_score(y_test_top3, y_pred_top3)
     print(f"Precision for Top 3: {precision_top3:.2f}")
     print(f"Accuracy for Top 3: {accuracy_top3:.2f}")
-
-
+    feature_importance = pd.DataFrame({
+        'Feature': X.columns,
+        'Importance': best_model.feature_importances_
+    })
+    feature_importance = feature_importance.sort_values(by='Importance', ascending=False)
     print("Feature Importance:")
     print(feature_importance)
-    return model
 
+    return best_model
 # Vorhersage für das letzte Rennen
 def predict_last_race(model, last_race_id):
     features_drivers = FeaturesDrivers()
@@ -243,23 +254,21 @@ def predict_last_race(model, last_race_id):
 
     driver_names = results['DriverID'].apply(lambda x: features_drivers.get_driver_name(x))
     results['Driver'] = driver_names
+
     constructor_names = results['ConstructorID'].apply(lambda x: features_constructor.get_constructor_name(x))
     results['Constructor'] = constructor_names
 
-    results = results.sort_values("ActualPosition")
+    results = results.sort_values("PredictedPosition")
 
     print("Predicted Last Race Results:")
-    print(results[['PredictedPosition', 'ActualPosition', 'Driver', 'Probability']])
-
+    print(results[['PredictedPosition', 'ActualPosition', 'Driver',  'Probability']])
 
 # Hauptprogramm
 def main():
-    races = [1058, 1059, 1060, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 1075,
-             1076, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094,
-             1095, 1096, 1097, 1098, 1099, 1099, 1100,1101]
+    races = list(range(1, 1102))
+#
 
-  #  races = [ 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094,
-   #          1095, 1096, 1097, 1098, 1099, 1099, 1100,1101]
+
     last_race_id = 1101
 
     # Daten vorbereiten

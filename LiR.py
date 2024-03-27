@@ -116,6 +116,11 @@ def train_and_evaluate_model(data):
     print(f"Precision for Top 3: {precision_top3:.2f}")
     print(f"Accuracy for Top 3: {accuracy_top3:.2f}")
 
+    feature_importance = pd.DataFrame({'Feature': X.columns, 'Importance': best_model.coef_})
+    feature_importance = feature_importance.sort_values('Importance', ascending=False)
+    print("\nFeature Importance:")
+    print(feature_importance)
+
     return best_model
 
 # Vorhersage für das letzte Rennen
@@ -232,8 +237,8 @@ def main():
     # Liste der Rennen der Saison 2023 (angenommene Werte)
     races = [1058, 1059, 1060, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 1075,
              1076, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094,
-             1095, 1096, 1097, 1098, 1099, 1099, 1100]
-    last_race_id = 1100
+             1095, 1096, 1097, 1098, 1099, 1099, 1100,1101]
+    last_race_id = 1101
 
     # Daten vorbereiten
     data = prepare_data(races, last_race_id)
