@@ -12,7 +12,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import RandomizedSearchCV
 from scipy.stats import randint, uniform
-
+from sklearn.model_selection import cross_val_score
 # Daten vorbereiten
 def prepare_data(races, last_race_id):
     features_drivers = FeaturesDrivers()
@@ -57,7 +57,7 @@ def prepare_data(races, last_race_id):
                 features_constructor.get_max_teammate_qualifying_position(constructor_id, driver_id, race_id),
                 *features_constructor.get_constructor_positions_gained_lost_last_x_races(constructor_id, race_id, 5),
                 *features_constructor.get_constructor_finishing_positions_last_x_races(constructor_id, race_id, 5),
-                features_constructor.get_constructor_speed_diff_to_fastest_last_race(constructor_id, race_id),
+
                 features_constructor.get_constructor_retirements(constructor_id),
                 features_constructor.get_constructor_retirements_last_x_races(constructor_id, race_id, 5),
                 *features_constructor.get_constructor_speed_stats_last_race(constructor_id, race_id),
@@ -75,7 +75,7 @@ def prepare_data(races, last_race_id):
         'ConstructorChampionshipsLast5Years', 'ConstructorStandingsLastYear', 'CurrentConstructorStandings',
         'MaxTeammateQualifyingPosition', 'MaxPositionsGainedLast5Races', 'MaxPositionsLostLast5Races',
         'AvgPositionsGainedLostLast5Races', 'BestFinishLast5Races', 'WorstFinishLast5Races', 'AvgFinishLast5Races',
-        'ConstructorSpeedDiffToFastestLastRace', 'ConstructorRetirements', 'ConstructorRetirementsLast5Races',
+         'ConstructorRetirements', 'ConstructorRetirementsLast5Races',
         'MaxSpeedLastRace', 'MinSpeedLastRace', 'AvgSpeedLastRace', 'ConstructorSpeedRankLastRace', 'RacePosition'
     ])
 
@@ -206,7 +206,7 @@ def predict_last_race(model, last_race_id):
             features_constructor.get_max_teammate_qualifying_position(constructor_id, driver_id, last_race_id),
             *features_constructor.get_constructor_positions_gained_lost_last_x_races(constructor_id, last_race_id, 5),
             *features_constructor.get_constructor_finishing_positions_last_x_races(constructor_id, last_race_id, 5),
-            features_constructor.get_constructor_speed_diff_to_fastest_last_race(constructor_id, last_race_id),
+       #     features_constructor.get_constructor_speed_diff_to_fastest_last_race(constructor_id, last_race_id),
             features_constructor.get_constructor_retirements(constructor_id),
             features_constructor.get_constructor_retirements_last_x_races(constructor_id, last_race_id, 5),
             *features_constructor.get_constructor_speed_stats_last_race(constructor_id, last_race_id),
@@ -223,7 +223,7 @@ def predict_last_race(model, last_race_id):
         'ConstructorChampionshipsLast5Years', 'ConstructorStandingsLastYear', 'CurrentConstructorStandings',
         'MaxTeammateQualifyingPosition', 'MaxPositionsGainedLast5Races', 'MaxPositionsLostLast5Races',
         'AvgPositionsGainedLostLast5Races', 'BestFinishLast5Races', 'WorstFinishLast5Races', 'AvgFinishLast5Races',
-        'ConstructorSpeedDiffToFastestLastRace', 'ConstructorRetirements', 'ConstructorRetirementsLast5Races',
+         'ConstructorRetirements', 'ConstructorRetirementsLast5Races',
         'MaxSpeedLastRace', 'MinSpeedLastRace', 'AvgSpeedLastRace', 'ConstructorSpeedRankLastRace'
     ])
 
@@ -265,11 +265,11 @@ def predict_last_race(model, last_race_id):
 
 # Hauptprogramm
 def main():
-    races = list(range(1, 1102))
+    races = list(range(1058, 1101))
 #
 
 
-    last_race_id = 1101
+    last_race_id = 1100
 
     # Daten vorbereiten
     data = prepare_data(races, last_race_id)

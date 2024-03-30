@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, precision_score
+from sklearn.metrics import accuracy_score, classification_report, precision_score, mean_absolute_error
 from FeaturesDrivers import FeaturesDrivers
 import numpy as np
 import decimal
@@ -94,6 +94,9 @@ def train_and_evaluate_model(data):
     plt.show()
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Model Accuracy: {accuracy:.2f}")
+    mae = mean_absolute_error(y_test, y_pred)
+
+    print(f"Mean Absolute Error (MAE): {mae:.2f}")
     print(classification_report(y_test, y_pred, zero_division=1))
 
     # Berechne die Precision und Accuracy für Top-10, Top-5 und Top-3
@@ -206,9 +209,7 @@ def predict_last_race(model, last_race_id):
 # Hauptprogramm
 def main():
     # Liste der Rennen der Saison 2023 (angenommene Werte)
-    races = [1058, 1059, 1060, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 1075,
-             1076, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094,
-             1095, 1096, 1097, 1098, 1099, 1099, 1100,1101]
+    races = list(range(1058, 1102))
     last_race_id = 1101
 
     # Daten vorbereiten
