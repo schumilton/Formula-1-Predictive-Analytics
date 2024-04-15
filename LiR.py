@@ -8,7 +8,7 @@ import decimal
 import matplotlib.pyplot as plt
 
 
-# Daten vorbereiten
+
 def prepare_data(races, last_race_id):
     features = FeaturesDrivers()
     data = []
@@ -52,32 +52,32 @@ def prepare_data(races, last_race_id):
         'AvgLapTimeConsistencyLastRace', 'SpeedRankLastRace', 'QualifyingPosition', 'RacePosition'
     ])
 
-    # Ersetze fehlende Werte nur in numerischen Spalten durch den Mittelwert
+
     numeric_columns = df.select_dtypes(include=[np.number]).columns
     df[numeric_columns] = df[numeric_columns].fillna(df[numeric_columns].mean())
 
-    # Ersetze fehlende Werte in nicht-numerischen Spalten durch den häufigsten Wert oder einen Standardwert
+
     non_numeric_columns = df.columns.difference(numeric_columns)
     for column in non_numeric_columns:
         if df[column].dtype == object:
             most_frequent_value = df[column].mode().iloc[0]
             if isinstance(most_frequent_value, tuple):
-                most_frequent_value = most_frequent_value[0]  # Nimm den ersten Wert des Tupels
+                most_frequent_value = most_frequent_value[0]
             df[column] = df[column].fillna(most_frequent_value)
         else:
-            df[column] = df[column].fillna(0)  # Oder einen anderen Standardwert verwenden
+            df[column] = df[column].fillna(0)
 
     return df
 
-# Modell trainieren und evaluieren
+
 def train_and_evaluate_model(data):
     X = data.drop(['DriverID', 'RacePosition'], axis=1)
     y = data['RacePosition']
 
-    # Daten in Trainings- und Testset aufteilen
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Hyperparameter-Optimierung
+
     model = Ridge()
     param_grid = {'alpha': [0.1, 1.0, 10.0]}
     grid_search = GridSearchCV(model, param_grid, cv=5, scoring='neg_mean_absolute_error')
@@ -85,7 +85,7 @@ def train_and_evaluate_model(data):
 
     best_model = grid_search.best_estimator_
 
-    # Bewertung des besten Modells auf dem Testset
+
     y_pred = best_model.predict(X_test)
     mse = mean_squared_error(y_test, y_pred)
     mae = mean_absolute_error(y_test, y_pred)
@@ -94,7 +94,7 @@ def train_and_evaluate_model(data):
     print(f"Mean Absolute Error (MAE): {mae:.2f}")
     print(f"Mean Squared Error: {mse:.2f}")
     print(f"R-squared: {r2:.2f}")
-    # Berechne die Precision und Accuracy für Top-10, Top-5 und Top-3
+
     y_test_top10 = y_test.apply(lambda x: 1 if x <= 10 else 0)
     y_pred_top10 = pd.Series(y_pred).apply(lambda x: 1 if x <= 10 else 0)
     precision_top10 = precision_score(y_test_top10, y_pred_top10)
@@ -123,7 +123,7 @@ def train_and_evaluate_model(data):
 
     return best_model
 
-# Vorhersage für das letzte Rennen
+
 def predict_last_race(model, last_race_id):
     features = FeaturesDrivers()
     driver_ids = features.get_driver_id(last_race_id)
@@ -198,7 +198,7 @@ def predict_last_race(model, last_race_id):
 def plot_linear_regression(X_test, y_test, model):
     plt.figure(figsize=(12, 8))
 
-    # Streudiagramm der tatsächlichen Werte
+
     plt.subplot(2, 2, 1)
     plt.scatter(range(len(y_test)), y_test, color='blue', label='Actual')
     plt.xlabel('Data Points')
@@ -206,7 +206,7 @@ def plot_linear_regression(X_test, y_test, model):
     plt.title('Actual Race Positions')
     plt.legend()
 
-    # Streudiagramm der vorhergesagten Werte
+
     plt.subplot(2, 2, 2)
     plt.scatter(range(len(y_test)), model.predict(X_test), color='red', label='Predicted')
     plt.xlabel('Data Points')
@@ -214,7 +214,7 @@ def plot_linear_regression(X_test, y_test, model):
     plt.title('Predicted Race Positions')
     plt.legend()
 
-    # Liniendiagramm der tatsächlichen und vorhergesagten Werte
+
     plt.subplot(2, 2, 3)
     plt.plot(range(len(y_test)), y_test, color='blue', label='Actual')
     plt.plot(range(len(y_test)), model.predict(X_test), color='red', label='Predicted')
@@ -223,7 +223,7 @@ def plot_linear_regression(X_test, y_test, model):
     plt.title('Actual vs Predicted Race Positions')
     plt.legend()
 
-    # Streudiagramm der tatsächlichen gegen die vorhergesagten Werte
+
     plt.subplot(2, 2, 4)
     plt.scatter(y_test, model.predict(X_test), color='green')
     plt.xlabel('Actual Race Position')
@@ -232,25 +232,25 @@ def plot_linear_regression(X_test, y_test, model):
 
     plt.tight_layout()
     plt.show()
-# Hauptprogramm
+
 def main():
-    # Liste der Rennen der Saison 2023 (angenommene Werte)
+
     races = list(range(1058, 1102))
     last_race_id = 1101
 
-    # Daten vorbereiten
+
     data = prepare_data(races, last_race_id)
 
-    # Modell trainieren und evaluieren
+
     X = data.drop(['DriverID', 'RacePosition'], axis=1)
     y = data['RacePosition']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     model = train_and_evaluate_model(data)
 
-    # Graph mit den Datenpunkten und der linearen Regression erstellen
+
     plot_linear_regression(X_test, y_test, model)
 
-    # Vorhersage für das letzte Rennen
+
     predict_last_race(model, last_race_id)
 
 

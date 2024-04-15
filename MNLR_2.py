@@ -10,8 +10,8 @@ import decimal
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-#Zusätzliche ConstructeurFeatures
-# Daten vorbereiten
+
+
 def prepare_data(races, last_race_id):
     features_drivers = FeaturesDrivers()
     features_constructor = FeaturesConstructor()
@@ -96,7 +96,7 @@ def prepare_data(races, last_race_id):
 
     return df
 
-# Modell trainieren und evaluieren
+
 def train_and_evaluate_model(data):
     X = data.drop(['DriverID', 'ConstructorID', 'RacePosition'], axis=1)
     y = data['RacePosition']
@@ -108,10 +108,10 @@ def train_and_evaluate_model(data):
 
     y_pred = model.predict(X_test)
 
-    # Konfusionsmatrix berechnen
+
     cm = confusion_matrix(y_test, y_pred)
 
-    # Konfusionsmatrix visualisieren
+
     plt.figure(figsize=(10, 10))
     sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', square=True, xticklabels=range(1, len(cm) + 1), yticklabels=range(1, len(cm) + 1))
     plt.xlabel('Predicted Position')
@@ -132,7 +132,7 @@ def train_and_evaluate_model(data):
     feature_importance['Absolute Importance'] = abs(feature_importance['Importance'])
     feature_importance = feature_importance.sort_values(by='Absolute Importance', ascending=False)
 
-    # Berechne die Precision und Accuracy für Top-10, Top-5 und Top-3
+
     y_test_top10 = y_test.apply(lambda x: 1 if x <= 10 else 0)
     y_pred_top10 = pd.Series(y_pred).apply(lambda x: 1 if x <= 10 else 0)
     precision_top10 = precision_score(y_test_top10, y_pred_top10)
@@ -159,7 +159,7 @@ def train_and_evaluate_model(data):
     print(feature_importance)
     return model
 
-# Vorhersage für das letzte Rennen
+
 def predict_last_race(model, last_race_id):
     features_drivers = FeaturesDrivers()
     features_constructor = FeaturesConstructor()
@@ -237,7 +237,7 @@ def predict_last_race(model, last_race_id):
     })
     results['PredictedPosition'] = results['Probability'].rank(method='dense', ascending=False).astype(int)
 
-    # Get the actual race positions for each driver in the last race
+
     actual_positions = []
     for driver_id in results['DriverID']:
         actual_position = features_drivers.get_race_position(driver_id, last_race_id)
@@ -266,13 +266,13 @@ def main():
    #          1095, 1096, 1097, 1098, 1099, 1099, 1100,1101]
     last_race_id = 1101
 
-    # Daten vorbereiten
+
     data = prepare_data(races, last_race_id)
 
-    # Modell trainieren und evaluieren
+
     model = train_and_evaluate_model(data)
 
-    # Vorhersage für das letzte Rennen
+
     predict_last_race(model, last_race_id)
 
 if __name__ == '__main__':

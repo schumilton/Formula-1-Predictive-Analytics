@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import RandomizedSearchCV
 from scipy.stats import randint, uniform
 
-# Daten vorbereiten
+
 def prepare_data(races, last_race_id):
     features_drivers = FeaturesDrivers()
     features_constructor = FeaturesConstructor()
@@ -98,7 +98,7 @@ def prepare_data(races, last_race_id):
 
     return df
 
-# Modell trainieren und evaluieren
+
 def train_and_evaluate_model(data, test_size=0.2, random_state=42):
     X = data.drop(['DriverID', 'ConstructorID', 'RacePosition'], axis=1)
     y = data['RacePosition']
@@ -124,7 +124,7 @@ def train_and_evaluate_model(data, test_size=0.2, random_state=42):
     y_pred = best_model.predict(X_test)
     cm = confusion_matrix(y_test, y_pred)
 
-    # Konfusionsmatrix visualisieren
+    # Konfusionsmatrix
     plt.figure(figsize=(10, 8))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
     plt.xlabel('Predicted')
@@ -139,7 +139,7 @@ def train_and_evaluate_model(data, test_size=0.2, random_state=42):
     print(f"Mean Absolute Error (MAE): {mae:.2f}")
     print(classification_report(y_test, y_pred, zero_division=1))
 
-    # Berechne die Precision und Accuracy für Top-10, Top-5 und Top-3
+
     y_test_top10 = y_test.apply(lambda x: 1 if x <= 10 else 0)
     y_pred_top10 = pd.Series(y_pred).apply(lambda x: 1 if x <= 10 else 0)
     precision_top10 = precision_score(y_test_top10, y_pred_top10)
@@ -169,7 +169,7 @@ def train_and_evaluate_model(data, test_size=0.2, random_state=42):
     print(feature_importance)
 
     return best_model
-# Vorhersage für das letzte Rennen
+
 def predict_last_race(model, last_race_id):
     features_drivers = FeaturesDrivers()
     features_constructor = FeaturesConstructor()
@@ -281,13 +281,13 @@ def main():
 
     last_race_id = 1101
 
-    # Daten vorbereiten
+
     data = prepare_data(races, last_race_id)
 
-    # Modell trainieren und evaluieren
+
     model = train_and_evaluate_model(data)
 
-    # Vorhersage für das letzte Rennen
+
     predict_last_race(model, last_race_id)
 
 if __name__ == '__main__':

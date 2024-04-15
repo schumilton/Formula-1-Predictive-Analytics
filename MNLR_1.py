@@ -8,7 +8,7 @@ import decimal
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
-# Daten vorbereiten
+
 def prepare_data(races, last_race_id):
     features = FeaturesDrivers()
     data = []
@@ -69,7 +69,7 @@ def prepare_data(races, last_race_id):
 
     return df
 
-# Modell trainieren und evaluieren
+
 def train_and_evaluate_model(data):
     X = data.drop(['DriverID', 'RacePosition'], axis=1)
     y = data['RacePosition']
@@ -81,10 +81,10 @@ def train_and_evaluate_model(data):
 
     y_pred = model.predict(X_test)
 
-    # Konfusionsmatrix berechnen
+
     cm = confusion_matrix(y_test, y_pred)
 
-    # Konfusionsmatrix visualisieren
+
     plt.figure(figsize=(10, 10))
     sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', square=True, xticklabels=range(1, len(cm) + 1),
                 yticklabels=range(1, len(cm) + 1))
@@ -99,7 +99,7 @@ def train_and_evaluate_model(data):
     print(f"Mean Absolute Error (MAE): {mae:.2f}")
     print(classification_report(y_test, y_pred, zero_division=1))
 
-    # Berechne die Precision und Accuracy für Top-10, Top-5 und Top-3
+
     y_test_top10 = y_test.apply(lambda x: 1 if x <= 10 else 0)
     y_pred_top10 = pd.Series(y_pred).apply(lambda x: 1 if x <= 10 else 0)
     precision_top10 = precision_score(y_test_top10, y_pred_top10)
@@ -132,7 +132,7 @@ def train_and_evaluate_model(data):
     print(feature_importance)
     return model
 
-# Vorhersage für das letzte Rennen
+
 def predict_last_race(model, last_race_id):
     features = FeaturesDrivers()
     driver_ids = features.get_driver_id(last_race_id)
@@ -173,13 +173,13 @@ def predict_last_race(model, last_race_id):
 
     X_last_race = df.drop(['DriverID'], axis=1)
 
-    # Konvertiere Timedelta-Werte in Sekunden, wenn sie nicht bereits als Gleitkommazahlen vorliegen
+
     timedelta_columns = ['AvgLapTimeLastRace', 'AvgLapTimeConsistencyLastRace', 'TimeDiffToWinnerLastRace']
     for column in timedelta_columns:
         if column in X_last_race.columns:
             X_last_race[column] = X_last_race[column].apply(lambda x: float(x.total_seconds()) if pd.notnull(x) and not isinstance(x, (float, decimal.Decimal)) else float(x) if pd.notnull(x) else x)
 
-    # Ersetze fehlende Werte durch den Mittelwert
+
     X_last_race = X_last_race.fillna(X_last_race.mean())
 
     y_pred_proba = model.predict_proba(X_last_race)
@@ -190,7 +190,7 @@ def predict_last_race(model, last_race_id):
     })
     results['PredictedPosition'] = results['Probability'].rank(method='dense', ascending=False).astype(int)
 
-    # Get the actual race positions for each driver in the last race
+
     actual_positions = []
     for driver_id in results['DriverID']:
         actual_position = features.get_race_position(driver_id, last_race_id)
@@ -206,19 +206,19 @@ def predict_last_race(model, last_race_id):
     print("Predicted Last Race Results:")
     print(results[['PredictedPosition', 'ActualPosition', 'Driver', 'Probability']])
 
-# Hauptprogramm
+
 def main():
-    # Liste der Rennen der Saison 2023 (angenommene Werte)
+
     races = list(range(1058, 1102))
     last_race_id = 1101
 
-    # Daten vorbereiten
+
     data = prepare_data(races, last_race_id)
 
-    # Modell trainieren und evaluieren
+
     model = train_and_evaluate_model(data)
 
-    # Vorhersage für das letzte Rennen
+
     predict_last_race(model, last_race_id)
 
 if __name__ == '__main__':

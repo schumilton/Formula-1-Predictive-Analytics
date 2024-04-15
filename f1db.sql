@@ -1,4 +1,4 @@
--- Table structure for table "circuits"
+
 DROP TABLE IF EXISTS circuits;
 CREATE TABLE circuits
 (
@@ -14,7 +14,7 @@ CREATE TABLE circuits
     UNIQUE (url)
 );
 
--- Table structure for table "status"
+
 DROP TABLE IF EXISTS status;
 CREATE TABLE status
 (
@@ -24,7 +24,7 @@ CREATE TABLE status
 
 );
 
--- Table structure for table "constructors"
+
 DROP TABLE IF EXISTS constructors;
 CREATE TABLE constructors
 (
@@ -37,7 +37,7 @@ CREATE TABLE constructors
 
 );
 
--- Table structure for table "drivers"
+
 DROP TABLE IF EXISTS drivers;
 CREATE TABLE drivers
 (
@@ -53,7 +53,7 @@ CREATE TABLE drivers
     UNIQUE (url, forename, surname)
 );
 
--- Table structure for table "seasons"
+
 DROP TABLE IF EXISTS seasons;
 CREATE TABLE seasons
 (
@@ -64,7 +64,7 @@ CREATE TABLE seasons
 );
 
 
--- Table structure for table "races"
+
 DROP TABLE IF EXISTS races;
 CREATE TABLE races
 (
@@ -80,7 +80,7 @@ CREATE TABLE races
     UNIQUE (url, name)
 );
 
--- Table structure for table "qualifying"
+
 DROP TABLE IF EXISTS qualifying;
 CREATE TABLE qualifying
 (
@@ -101,7 +101,7 @@ CREATE TABLE qualifying
 );
 
 
--- Table structure for table "results"
+
 DROP TABLE IF EXISTS results;
 CREATE TABLE results
 (
@@ -131,7 +131,7 @@ CREATE TABLE results
 
 );
 
--- Table structure for table "sprintResults"
+
 DROP TABLE IF EXISTS sprintResults;
 CREATE TABLE sprintResults
 (
@@ -172,7 +172,7 @@ CREATE TABLE sprintResults
 --                            UNIQUE (raceId,constructorResultsId)
 --);
 
---Table structure for table "constructorStandings"
+
 DROP TABLE IF EXISTS constructorStandings;
 CREATE TABLE constructorStandings
 (
@@ -189,7 +189,7 @@ CREATE TABLE constructorStandings
 );
 
 
--- Table structure for table "driverStandings"
+
 DROP TABLE IF EXISTS driverStandings;
 CREATE TABLE driverStandings
 (
@@ -206,7 +206,7 @@ CREATE TABLE driverStandings
 );
 
 
--- Table structure for table "lapTimes"
+
 DROP TABLE IF EXISTS lapTimes;
 CREATE TABLE lapTimes
 (
@@ -222,7 +222,7 @@ CREATE TABLE lapTimes
     unique (raceId, driverId, lap)
 );
 
--- Table structure for table "pitStops"
+
 DROP TABLE IF EXISTS pitStops;
 CREATE TABLE pitStops
 (
@@ -241,25 +241,3 @@ CREATE TABLE pitStops
 
 
 
---INSERT INTO circuits (name,location,country,lat, lng,alt, url)
---                          VALUES ('test','germany','germany',23.0,3.0,2.0,'eewr')
-
---position = constructorstanding + driverstanding+ qualiyingposition + jahre + strecke
-SELECT results.position,
-        drivers.surname,
-        constructorstandings.position as constructorPosition,
-         driverstandings.position as driverstandingPosition,
-         qualifying.position as qualfyingposition,
-         races.raceId,
-        races.name
-
-FROM results
-         inner join races on (results.raceid = races.raceid)
-         inner join drivers on (results.driverid = drivers.driverid)
-         inner join constructorstandings on (results.constructorId = constructorstandings.constructorId) AND (races.raceId = constructorstandings.raceId)
-         inner join driverstandings on (results.driverid = driverstandings.driverid) AND (races.raceId = driverstandings.raceId)
-         inner join qualifying on (results.driverid = qualifying.driverid) AND races.raceId = qualifying.raceId
-         inner join circuits on (races.circuitid = circuits.circuitid)
-
-
---Abu dhabi ist nicht dabei da kein driverstanding dazu existiert
