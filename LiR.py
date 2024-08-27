@@ -180,7 +180,7 @@ def predict_last_race(model, last_race_id):
         'PredictedPosition': y_pred
     })
 
-    # Get the actual race positions for each driver in the last race
+
     actual_positions = []
     for driver_id in results['DriverID']:
         actual_position = features.get_race_position(driver_id, last_race_id)

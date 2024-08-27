@@ -92,7 +92,7 @@ def prepare_data(races, last_race_id):
                     most_frequent_value = most_frequent_value[0]
                 df[column] = df[column].fillna(most_frequent_value)
             else:
-                df[column] = df[column].fillna(0)  # Or choose a suitable default value
+                df[column] = df[column].fillna(0)
         else:
             df[column] = df[column].fillna(0)
 
